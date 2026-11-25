@@ -109,12 +109,35 @@ Contoh body tiap request ada di koleksi Postman.
 
 ## Deploy ke Vercel
 
-Belum di-deploy. URL: _isi setelah deploy_.
+URL production: https://project-paw-ii-backend.vercel.app
+
+Cek status: https://project-paw-ii-backend.vercel.app/api/health
+
+Database memakai MongoDB Atlas (`punya`), fungsi Vercel berjalan di region Singapura (`sin1`), dan production di-deploy dari branch `main`.
+
+Langkah deploy:
 
 1. Di Atlas, buat cluster (region Singapura) dan user database `readWrite` untuk `punya`, lalu izinkan `0.0.0.0/0` pada IP Access List.
 2. Di Vercel, import repository. `src/app.js` terdeteksi sebagai aplikasi Express.
-3. Isi environment variable di dashboard Vercel (semua variabel di atas kecuali `PORT`).
-4. Buka `/api/health`, lalu jalankan koleksi Postman dengan `baseUrl` berisi URL Vercel.
+3. Isi environment variable di dashboard Vercel (semua variabel di atas kecuali `PORT`). Nilai diisi tanpa awalan `NAMA=` dan tanpa tanda kutip.
+4. Di **Settings → Functions → Function Region**, pilih Singapura (`sin1`).
+5. Redeploy setiap kali environment variable atau region diubah.
+6. Buka `/api/health`, lalu jalankan koleksi Postman dengan `baseUrl` berisi URL Vercel (tanpa garis miring di akhir).
+
+Kalau `/api/health` menjawab 500, lihat tab **Logs** di Vercel. `MongoParseError` berarti format `MONGODB_URI` salah.
+
+### Hasil pengujian
+
+Koleksi Postman dijalankan dengan Newman pada 25 November 2026:
+
+| Target | Request | Assertion | Gagal |
+|---|---|---|---|
+| Lokal dengan Atlas (`punya_test`) | 66 | 71 | 0 |
+| Production | 66 | 71 | 0 |
+
+- Tes draft AI dari foto dilewati karena `GEMINI_API_KEY` belum diisi.
+- Putusan sengketa yang diuji hanya `REFUND`, belum `RELEASE`.
+- Setelah koleksi dijalankan di production, `MONGODB_URI` di Vercel diubah dan sempat salah format. Setelah diperbaiki, yang dicek ulang hanya `/api/health`, `/api/listings`, URL tidak dikenal (404), dan `/api/auth/me` tanpa token (401).
 
 ## Keterbatasan
 
