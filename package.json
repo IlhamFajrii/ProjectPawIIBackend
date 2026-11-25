@@ -1,0 +1,23 @@
+{
+  "name": "punya-backend",
+  "version": "1.0.0",
+  "description": "REST API PUNYA: marketplace lokal Palembang dengan Rekber simulasi",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file=.env src/server.js",
+    "start": "node src/server.js",
+    "seed": "node --env-file=.env scripts/seed.js",
+    "make-admin": "node --env-file=.env scripts/make-admin.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.13.1"
+  }
+}
