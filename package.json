@@ -14,6 +14,7 @@
     "make-admin": "node --env-file=.env scripts/make-admin.js"
   },
   "dependencies": {
+    "@vercel/blob": "^2.9.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "express": "^5.3.0",

@@ -10,6 +10,7 @@ import conversations from './routes/conversations.js';
 import disputes from './routes/disputes.js';
 import listings from './routes/listings.js';
 import orders from './routes/orders.js';
+import uploads from './routes/uploads.js';
 import users from './routes/users.js';
 import { HttpError, ok } from './utils/http.js';
 
@@ -59,6 +60,7 @@ app.use('/api/orders', orders);
 app.use('/api/disputes', disputes);
 app.use('/api/circles', circles);
 app.use('/api/conversations', conversations);
+app.use('/api/uploads', uploads);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -21,6 +21,7 @@ npm run dev               # http://localhost:3000/api/health
 | `JWT_SECRET` | ya | Acak dan panjang. Buat dengan `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
 | `JWT_EXPIRES_IN` | tidak | Default `7d` |
 | `CORS_ORIGIN` | untuk web | Origin web, pisahkan dengan koma, tanpa garis miring di akhir |
+| `BLOB_READ_WRITE_TOKEN` | untuk unggah foto | Dibuat otomatis saat store Vercel Blob (public) dihubungkan ke project. Untuk lokal: `npx vercel env pull .env.local`, lalu salin barisnya ke `.env` |
 | `GEMINI_API_KEY`, `GEMINI_MODEL` | untuk AI draft | Kalau salah satu kosong, endpoint AI menjawab 500 |
 | `PORT` | tidak | Hanya untuk lokal, default `3000` |
 
@@ -74,6 +75,7 @@ npm run dev               # http://localhost:3000/api/health
 | GET | `/api/conversations/:id/messages` | peserta |
 | POST | `/api/conversations/:id/messages` | peserta |
 | POST | `/api/ai/draft-listing` | token |
+| POST | `/api/uploads` | token |
 
 Contoh body tiap request ada di koleksi Postman.
 
@@ -86,6 +88,8 @@ Contoh body tiap request ada di koleksi Postman.
 - Filter `GET /api/orders`: `role` (`buyer` atau `seller`) dan `status`.
 - Pesan baru diambil dengan `GET /api/conversations/:id/messages?after=<waktu ISO 8601>`.
 - AI draft: `{ "imageBase64": "<tanpa awalan data:>", "mimeType": "image/jpeg", "note": "opsional" }`, foto maksimal 3 MB.
+
+Unggah foto: `/api/uploads` dipakai oleh `upload()` dari `@vercel/blob/client`. Responsnya izin sekali pakai (tanpa amplop `success`) untuk satu file JPEG maksimal 3 MB di `listings/<id pengguna>/`.
 
 ## Status pesanan
 
