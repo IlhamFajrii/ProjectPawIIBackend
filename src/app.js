@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import { connectDB } from './config/db.js';
+import home from './home.js';
 import { errorHandler, notFound } from './middleware/error.js';
 import ai from './routes/ai.js';
 import auth from './routes/auth.js';
@@ -29,6 +30,8 @@ app.use((req, res, next) => {
 
 const origins = (process.env.CORS_ORIGIN ?? '').split(',').map((o) => o.trim()).filter(Boolean);
 app.use(cors({ origin: origins }));
+
+app.get('/', (req, res) => res.type('html').send(home));
 
 app.get('/api/health', async (req, res) => {
   try {
