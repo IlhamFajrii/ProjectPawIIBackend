@@ -1,6 +1,12 @@
 # PUNYA Backend
 
-REST API untuk PUNYA, marketplace lokal Palembang (barang, sewa, jasa, bantuan) dengan Rekber simulasi. Dibuat dengan Express 5, MongoDB (Mongoose), dan JWT, untuk di-deploy ke Vercel.
+REST API untuk PUNYA, marketplace lokal Palembang (barang, sewa, jasa, bantuan) dengan Rekber simulasi. Dibuat dengan Express 5, MongoDB (Mongoose), JWT, dan Vercel Blob, untuk di-deploy ke Vercel.
+
+| Layanan | Alamat |
+|---|---|
+| API production | https://project-paw-ii-backend.vercel.app |
+| Status | https://project-paw-ii-backend.vercel.app/api/health |
+| Aplikasi web | https://project-paw-ii-frontend.vercel.app |
 
 ## Menjalankan di lokal
 
@@ -15,14 +21,16 @@ npm run dev               # http://localhost:3000/api/health
 
 `MONGODB_URI` harus mengarah ke MongoDB Atlas atau replica set lain karena pesanan dan sengketa memakai transaksi. MongoDB lokal tanpa replica set tidak cukup.
 
+## Variabel
+
 | Variabel | Wajib | Keterangan |
 |---|---|---|
 | `MONGODB_URI` | ya | Connection string, sertakan nama database `/punya` |
 | `JWT_SECRET` | ya | Acak dan panjang. Buat dengan `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
 | `JWT_EXPIRES_IN` | tidak | Default `7d` |
-| `CORS_ORIGIN` | untuk web | Origin web, pisahkan dengan koma, tanpa garis miring di akhir |
+| `CORS_ORIGIN` | bila browser memanggil API langsung | Origin web, pisahkan dengan koma, tanpa garis miring di akhir. Frontend di Vercel meneruskan `/api` sehingga tidak memerlukannya |
 | `BLOB_READ_WRITE_TOKEN` | untuk unggah foto | Dibuat otomatis saat store Vercel Blob (public) dihubungkan ke project. Untuk lokal: `npx vercel env pull .env.local`, lalu salin barisnya ke `.env` |
-| `GEMINI_API_KEY`, `GEMINI_MODEL` | untuk AI draft | Kalau salah satu kosong, endpoint AI menjawab 500 |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | untuk draft AI | Kalau salah satu kosong, endpoint AI menjawab 500 |
 | `PORT` | tidak | Hanya untuk lokal, default `3000` |
 
 ## Skrip
@@ -32,6 +40,23 @@ npm run dev               # http://localhost:3000/api/health
 | `npm run dev` | Server dengan reload otomatis |
 | `npm run seed` | Menambah 4 listing contoh, aman diulang |
 | `npm run make-admin -- 081234567890` | Menjadikan akun terdaftar sebagai admin |
+
+## Struktur
+
+```
+ProjectPawIIBackend/
+  postman/          koleksi Postman
+  scripts/          seed.js, make-admin.js
+  src/
+    app.js          aplikasi Express, CORS, dan pemasangan rute
+    server.js       server untuk lokal
+    config/         koneksi database
+    controllers/    logika tiap endpoint
+    middleware/     autentikasi dan penanganan error
+    models/         skema Mongoose
+    routes/         definisi rute
+    utils/          konstanta, respons HTTP, status pesanan, Gemini
+```
 
 ## Endpoint
 
@@ -77,7 +102,7 @@ npm run dev               # http://localhost:3000/api/health
 | POST | `/api/ai/draft-listing` | token |
 | POST | `/api/uploads` | token |
 
-Contoh body tiap request ada di koleksi Postman.
+Contoh body request ada di koleksi Postman, kecuali untuk `/api/uploads`.
 
 ## Format request dan response
 
@@ -87,9 +112,11 @@ Contoh body tiap request ada di koleksi Postman.
 - Filter `GET /api/listings`: `q`, `type`, `category`, `district`, `minPrice`, `maxPrice`, `page`, `limit`.
 - Filter `GET /api/orders`: `role` (`buyer` atau `seller`) dan `status`.
 - Pesan baru diambil dengan `GET /api/conversations/:id/messages?after=<waktu ISO 8601>`.
-- AI draft: `{ "imageBase64": "<tanpa awalan data:>", "mimeType": "image/jpeg", "note": "opsional" }`, foto maksimal 3 MB.
+- Draft AI: `{ "imageBase64": "<tanpa awalan data:>", "mimeType": "image/jpeg", "note": "opsional" }`, foto maksimal 3 MB.
 
-Unggah foto: `/api/uploads` dipakai oleh `upload()` dari `@vercel/blob/client`. Responsnya izin sekali pakai (tanpa amplop `success`) untuk satu file JPEG maksimal 3 MB di `listings/<id pengguna>/`.
+## Unggah foto
+
+`/api/uploads` dipakai oleh `upload()` dari `@vercel/blob/client`. Responsnya izin sekali pakai (tanpa amplop `success`) untuk satu file JPEG maksimal 3 MB di `listings/<id pengguna>/` atau `avatars/<id pengguna>/`. Izin berlaku 5 menit, dan file dikirim langsung dari browser ke Vercel Blob.
 
 ## Status pesanan
 
@@ -113,24 +140,19 @@ Unggah foto: `/api/uploads` dipakai oleh `upload()` dari `@vercel/blob/client`. 
 
 ## Deploy ke Vercel
 
-URL production: https://project-paw-ii-backend.vercel.app
-
-Cek status: https://project-paw-ii-backend.vercel.app/api/health
-
 Database memakai MongoDB Atlas (`punya`), fungsi Vercel berjalan di region Singapura (`sin1`), dan production di-deploy dari branch `main`.
-
-Langkah deploy:
 
 1. Di Atlas, buat cluster (region Singapura) dan user database `readWrite` untuk `punya`, lalu izinkan `0.0.0.0/0` pada IP Access List.
 2. Di Vercel, import repository. `src/app.js` terdeteksi sebagai aplikasi Express.
-3. Isi environment variable di dashboard Vercel (semua variabel di atas kecuali `PORT`). Nilai diisi tanpa awalan `NAMA=` dan tanpa tanda kutip.
-4. Di **Settings → Functions → Function Region**, pilih Singapura (`sin1`).
-5. Redeploy setiap kali environment variable atau region diubah.
-6. Buka `/api/health`, lalu jalankan koleksi Postman dengan `baseUrl` berisi URL Vercel (tanpa garis miring di akhir).
+3. Di tab **Storage**, buat store Blob dengan akses public dan hubungkan ke project. `BLOB_READ_WRITE_TOKEN` ditambahkan otomatis.
+4. Isi environment variable lain di dashboard Vercel (semua variabel di atas kecuali `PORT`). Nilai diisi tanpa awalan `NAMA=` dan tanpa tanda kutip.
+5. Di **Settings > Functions > Function Region**, pilih Singapura (`sin1`).
+6. Redeploy setiap kali environment variable atau region diubah.
+7. Buka `/api/health`, lalu jalankan koleksi Postman dengan `baseUrl` berisi URL Vercel (tanpa garis miring di akhir).
 
 Kalau `/api/health` menjawab 500, lihat tab **Logs** di Vercel. `MongoParseError` berarti format `MONGODB_URI` salah.
 
-### Hasil pengujian
+## Hasil pengujian
 
 Koleksi Postman dijalankan dengan Newman pada 25 November 2026:
 
@@ -143,9 +165,12 @@ Koleksi Postman dijalankan dengan Newman pada 25 November 2026:
 - Putusan sengketa yang diuji hanya `REFUND`, belum `RELEASE`.
 - Setelah koleksi dijalankan di production, `MONGODB_URI` di Vercel diubah dan sempat salah format. Setelah diperbaiki, yang dicek ulang hanya `/api/health`, `/api/listings`, URL tidak dikenal (404), dan `/api/auth/me` tanpa token (401).
 
+Unggah foto diuji pada 26 November 2026 dengan backend lokal (`punya_test`) dan store Blob sungguhan: unggah foto listing dan foto profil berhasil, sedangkan request tanpa token, folder pengguna lain, dan nama file di luar aturan ditolak. Unggah foto belum diuji ujung ke ujung di production.
+
 ## Keterbatasan
 
-- Login, register, kode undangan, dan AI draft belum dibatasi jumlah percobaannya, sehingga satu akun bisa menghabiskan kuota Gemini. Pembatasan perlu firewall Vercel atau penyimpanan bersama, karena penghitung di memori tidak berlaku antar-instance.
+- Login, register, kode undangan, draft AI, dan unggah foto belum dibatasi jumlah percobaannya, sehingga satu akun bisa menghabiskan kuota Gemini atau Blob. Pembatasan perlu firewall Vercel atau penyimpanan bersama, karena penghitung di memori tidak berlaku antar-instance.
+- Foto di Vercel Blob tidak ikut terhapus saat listing atau foto profil diubah.
 - Polling chat dengan `after` bisa melewatkan pesan yang tersimpan hampir bersamaan. Client sebaiknya mengambil ulang dengan rentang yang sedikit tumpang-tindih, lalu membuang duplikat berdasarkan `_id`.
 - Logout tidak membatalkan token. Token berlaku sampai kedaluwarsa.
 - Chat memakai polling, belum Socket.IO.

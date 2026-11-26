@@ -11,7 +11,7 @@ export async function token(req, res) {
   if (req.body.type !== 'blob.generate-client-token') throw new HttpError(400, 'Request tidak valid');
 
   // Setiap pengguna hanya boleh menulis di foldernya sendiri.
-  const allowed = new RegExp(`^listings/${req.user.id}/[\\w-]{1,60}\\.jpg$`);
+  const allowed = new RegExp(`^(listings|avatars)/${req.user.id}/[\\w-]{1,60}\\.jpg$`);
 
   const result = await handleUpload({
     body: req.body,
