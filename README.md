@@ -144,7 +144,7 @@ Contoh body request ada di koleksi Postman, kecuali untuk `/api/uploads`.
 
 ## Unggah foto
 
-`/api/uploads` dipakai oleh `upload()` dari `@vercel/blob/client`. Responsnya izin sekali pakai (tanpa amplop `success`) untuk satu file JPEG maksimal 3 MB di `listings/<id pengguna>/` atau `avatars/<id pengguna>/`. Izin berlaku 5 menit, dan file dikirim langsung dari browser ke Vercel Blob.
+`/api/uploads` dipakai oleh `upload()` dari `@vercel/blob/client`. Responsnya izin sekali pakai (tanpa amplop `success`) untuk satu file JPEG maksimal 3 MB di `listings/<id pengguna>/`, `avatars/<id pengguna>/`, atau `evidence/<id pengguna>/` (bukti sengketa). Izin berlaku 5 menit, dan file dikirim langsung dari browser ke Vercel Blob.
 
 ## Status pesanan
 
