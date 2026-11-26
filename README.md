@@ -1,12 +1,40 @@
 # PUNYA Backend
 
-REST API untuk PUNYA, marketplace lokal Palembang (barang, sewa, jasa, bantuan) dengan Rekber simulasi. Dibuat dengan Express 5, MongoDB (Mongoose), JWT, dan Vercel Blob, untuk di-deploy ke Vercel.
+REST API untuk PUNYA, marketplace lokal Palembang (barang, sewa, jasa, bantuan) dengan Rekber simulasi.
+
+![Node.js](https://img.shields.io/badge/Node.js-24-5FA04E?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5.3-000000?logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-9.13-880000?logo=mongoose&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-9.0-000000?logo=jsonwebtokens&logoColor=white)
+![Vercel Blob](https://img.shields.io/badge/Vercel%20Blob-2.9-000000?logo=vercel&logoColor=white)
+![Gemini API](https://img.shields.io/badge/Gemini%20API-REST-8E75B2?logo=googlegemini&logoColor=white)
+![Postman](https://img.shields.io/badge/Postman-Newman-FF6C37?logo=postman&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-hosting-000000?logo=vercel&logoColor=white)
 
 | Layanan | Alamat |
 |---|---|
 | API production | https://project-paw-ii-backend.vercel.app |
 | Status | https://project-paw-ii-backend.vercel.app/api/health |
 | Aplikasi web | https://project-paw-ii-frontend.vercel.app |
+
+## Teknologi
+
+Versi di bawah adalah yang terpasang saat README ini ditulis.
+
+| Teknologi | Versi | Kegunaan |
+|---|---|---|
+| Node.js | 24 | Runtime, modul ES |
+| Express | 5.3 | Framework REST API |
+| MongoDB Atlas | | Database |
+| Mongoose | 9.13 | Skema, query, dan transaksi |
+| JSON Web Token (`jsonwebtoken`) | 9.0 | Autentikasi Bearer token |
+| bcryptjs | 3.0 | Hash password |
+| cors | 2.8 | Pembatasan origin |
+| Vercel Blob (`@vercel/blob`) | 2.9 | Penyimpanan foto |
+| Google Gemini API | | Draft listing dari foto, dipanggil lewat REST |
+| Postman dan Newman | | Pengujian endpoint |
+| Vercel | | Hosting |
 
 ## Menjalankan di lokal
 
