@@ -83,6 +83,7 @@ ${members.map(([name, nim, role]) => `<li>${name} (${nim})${role ? ` &ndash; ${r
 
 <h2 id="endpoint">Daftar endpoint</h2>
 <p>Endpoint bertautan bisa dibuka langsung di browser. Sisanya diuji lewat Postman. Akses selain publik memerlukan header <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+<p><code>/api/health</code> dipakai untuk mengecek apakah server terhubung ke database. Kalau terhubung, statusnya 200 dan respons berisi <code>"database": "connected"</code>. Kalau tidak, statusnya 500 dengan pesan "Database tidak terhubung".</p>
 <table aria-labelledby="endpoint">
 <thead><tr><th scope="col">Method</th><th scope="col">URL</th><th scope="col">Akses</th></tr></thead>
 <tbody>
