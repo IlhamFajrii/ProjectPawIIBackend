@@ -77,6 +77,7 @@ ProjectPawIIBackend/
   scripts/          seed.js, make-admin.js
   src/
     app.js          aplikasi Express, CORS, dan pemasangan rute
+    home.js         halaman utama (GET /) berisi daftar endpoint
     server.js       server untuk lokal
     config/         koneksi database
     controllers/    logika tiap endpoint
@@ -130,7 +131,7 @@ ProjectPawIIBackend/
 | POST | `/api/ai/draft-listing` | token |
 | POST | `/api/uploads` | token |
 
-Contoh body request ada di koleksi Postman, kecuali untuk `/api/uploads`.
+Contoh body request ada di koleksi Postman. Selain endpoint di atas, `GET /` menampilkan halaman HTML berisi daftar endpoint.
 
 ## Format request dan response
 
@@ -139,6 +140,7 @@ Contoh body request ada di koleksi Postman, kecuali untuk `/api/uploads`.
 - Daftar berpaginasi mengembalikan `{ items, page, limit, total }`.
 - Filter `GET /api/listings`: `q`, `type`, `category`, `district`, `minPrice`, `maxPrice`, `page`, `limit`.
 - Filter `GET /api/orders`: `role` (`buyer` atau `seller`) dan `status`.
+- Filter `GET /api/disputes`: `status` (`OPEN` atau `RESOLVED`).
 - Pesan baru diambil dengan `GET /api/conversations/:id/messages?after=<waktu ISO 8601>`.
 - Draft AI: `{ "imageBase64": "<tanpa awalan data:>", "mimeType": "image/jpeg", "note": "opsional" }`, foto maksimal 3 MB.
 
@@ -162,9 +164,13 @@ Contoh body request ada di koleksi Postman, kecuali untuk `/api/uploads`.
 ## Uji dengan Postman
 
 1. Import `postman/punya.postman_collection.json`.
-2. Isi variabel koleksi `baseUrl` (default `http://localhost:3000`).
-3. Untuk putusan sengketa, daftarkan satu akun, jalankan `npm run make-admin`, lalu isi `adminPhone` dan `adminPassword`. Kalau kosong, dua request admin dilewati.
-4. Jalankan seluruh koleksi lewat Collection Runner sesuai urutan, karena request memakai ID dan token dari request sebelumnya.
+2. Isi variabel koleksi `baseUrl` (default `http://localhost:3000`). Untuk production, isi URL Vercel.
+3. Untuk putusan sengketa, daftarkan satu akun, jalankan `npm run make-admin`, lalu isi `adminPhone` dan `adminPassword`. Kalau kosong, request admin dan yang bergantung padanya dilewati.
+4. Folder unggah foto membutuhkan `BLOB_READ_WRITE_TOKEN` di backend yang diuji. Yang diuji hanya izin unggah, tidak ada file yang dikirim.
+5. Draft AI dari foto dilewati. Isi variabel `runAiDraft` bila `GEMINI_API_KEY` sudah terpasang.
+6. Jalankan seluruh koleksi lewat Collection Runner sesuai urutan, karena request memakai ID dan token dari request sebelumnya.
+
+Setiap kali dijalankan, akun, pesanan, sengketa, circle, dan chat uji baru masuk ke database. Listing uji dinonaktifkan di akhir. Password akun uji dibuat acak. Jangan commit koleksi yang sudah berisi `adminPassword`.
 
 ## Deploy ke Vercel
 
@@ -182,18 +188,17 @@ Kalau `/api/health` menjawab 500, lihat tab **Logs** di Vercel. `MongoParseError
 
 ## Hasil pengujian
 
-Koleksi Postman dijalankan dengan Newman pada 25 November 2026:
+Koleksi Postman dijalankan dengan Newman pada 27 November 2026:
 
 | Target | Request | Assertion | Gagal |
 |---|---|---|---|
-| Lokal dengan Atlas (`punya_test`) | 66 | 71 | 0 |
-| Production | 66 | 71 | 0 |
+| Lokal dengan Atlas (`punya_test`) | 82 | 93 | 0 |
+| Production | 82 | 93 | 0 |
 
-- Tes draft AI dari foto dilewati karena `GEMINI_API_KEY` belum diisi.
-- Putusan sengketa yang diuji hanya `REFUND`, belum `RELEASE`.
-- Setelah koleksi dijalankan di production, `MONGODB_URI` di Vercel diubah dan sempat salah format. Setelah diperbaiki, yang dicek ulang hanya `/api/health`, `/api/listings`, URL tidak dikenal (404), dan `/api/auth/me` tanpa token (401).
+- Putusan sengketa `REFUND` dan `RELEASE` keduanya diuji.
+- Draft AI dari foto dilewati karena `GEMINI_API_KEY` belum diisi.
 
-Unggah foto diuji pada 26 November 2026 dengan backend lokal (`punya_test`) dan store Blob sungguhan: unggah foto listing dan foto profil berhasil, sedangkan request tanpa token, folder pengguna lain, dan nama file di luar aturan ditolak. Unggah foto belum diuji ujung ke ujung di production.
+Lewat aplikasi web, putusan sengketa, unggah foto, dan foto bukti sengketa juga sudah dicoba.
 
 ## Keterbatasan
 
